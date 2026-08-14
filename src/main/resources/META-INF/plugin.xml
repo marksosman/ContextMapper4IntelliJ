@@ -1,0 +1,14 @@
+<idea-plugin>
+    <id>io.github.marksosman.dddcontextmapper</id>
+    <name>DDDContextMapper</name>
+    <vendor>marksosman</vendor>
+
+    <description><![CDATA[
+        Context Mapper DSL (CML) support for IntelliJ IDEA.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+</idea-plugin>
