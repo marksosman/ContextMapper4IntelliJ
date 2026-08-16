@@ -10,5 +10,19 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileType
+            name="CML"
+            implementationClass="io.github.marksosman.dddcontextmapper.CmlFileType"
+            fieldName="INSTANCE"
+            language="CML"
+            extensions="cml"/>
+
+        <lang.parserDefinition
+            language="CML"
+            implementationClass="io.github.marksosman.dddcontextmapper.CmlParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory
+            language="CML"
+            implementationClass="io.github.marksosman.dddcontextmapper.CmlSyntaxHighlighterFactory"/>
     </extensions>
 </idea-plugin>
