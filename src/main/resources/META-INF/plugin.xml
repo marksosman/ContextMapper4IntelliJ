@@ -1,10 +1,17 @@
 <idea-plugin>
     <id>io.github.marksosman.dddcontextmapper</id>
     <name>DDDContextMapper</name>
-    <vendor>marksosman</vendor>
+    <vendor email="marksosman@icloud.com" url="https://github.com/marksosman">marksosman</vendor>
 
     <description><![CDATA[
-        Context Mapper DSL (CML) support for IntelliJ IDEA.
+        <p>This plug-in is editor support for Context Mapper's CML, a DSL for Domain-Driven Design
+    context mapping and service decomposition.</p>
+    <p>Features:</p>
+    <ul>
+        <li>Recognizes <code>.cml</code> files</li>
+        <li>Syntax highlighting for keywords, strings, constants, and comments</li>
+    </ul>
+    <p>This is an independent community plugin, not affiliated with the Context Mapper project.</p>
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
