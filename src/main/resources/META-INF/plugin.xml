@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>io.github.marksosman.dddcontextmapper</id>
     <name>DDDContextMapper</name>
-    <vendor email="marksosman@icloud.com" url="https://github.com/marksosman">marksosman</vendor>
+    <vendor url="https://github.com/marksosman">marksosman</vendor>
 
     <description><![CDATA[
         <p>This plug-in is editor support for Context Mapper's CML, a DSL for Domain-Driven Design
