@@ -15,6 +15,18 @@
     <p>This is an independent community plugin, not affiliated with the Context Mapper project.</p>
     ]]></description>
 
+    <change-notes><![CDATA[
+        <h3>0.2.0</h3>
+        <ul>
+            <li>+Keyword completion</li>
+        </ul>
+        <h3>0.1.0</h3>
+        <ul>
+            <li>+Syntax highlighting</li>
+            <li>+CML file type recognition</li>
+        </ul>
+    ]]></change-notes>
+
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
