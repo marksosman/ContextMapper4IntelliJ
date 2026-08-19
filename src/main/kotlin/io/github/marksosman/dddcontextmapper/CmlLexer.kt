@@ -4,6 +4,7 @@ import com.intellij.lexer.LexerBase
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 
+/*
 private val KEYWORDS = setOf(
     "ContextMap", "BoundedContext", "Domain", "Subdomain", "Aggregate",
     "Entity", "ValueObject", "Service", "Repository", "Enum", "Module",
@@ -15,6 +16,8 @@ private val KEYWORDS = setOf(
     "OpenHostService", "PublishedLanguage", "AntiCorruptionLayer", "Conformist",
     "aggregateRoot", "not", "key", "def", "abstract", "extends"
 )
+*/
+private val KEYWORDS: Set<String> = CmlKeywords.ALL
 
 class CmlLexer : LexerBase() {
     private var buf: CharSequence = ""

@@ -10,6 +10,7 @@
     <ul>
         <li>Recognizes <code>.cml</code> files</li>
         <li>Syntax highlighting for keywords, strings, constants, and comments</li>
+        <li>Keyword completion</li>
     </ul>
     <p>This is an independent community plugin, not affiliated with the Context Mapper project.</p>
     ]]></description>
@@ -31,5 +32,9 @@
         <lang.syntaxHighlighterFactory
             language="CML"
             implementationClass="io.github.marksosman.dddcontextmapper.CmlSyntaxHighlighterFactory"/>
+
+        <completion.contributor
+                language="CML"
+                implementationClass="io.github.marksosman.dddcontextmapper.CmlCompletionContributor"/>
     </extensions>
 </idea-plugin>
