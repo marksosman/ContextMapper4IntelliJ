@@ -22,5 +22,7 @@ object CmlKeywords {
         "OpenHostService", "PublishedLanguage", "AntiCorruptionLayer", "Conformist"
     )
 
-    val ALL: Set<String> = (DECLARATIONS + PROPERTIES + RELATIONSHIPS).toSet()
+    val DECLARATION_SET = DECLARATIONS.toSet()
+    val PROPERTY_SET = PROPERTIES.toSet()
+    val RELATIONSHIP_SET = RELATIONSHIPS.toSet()
 }

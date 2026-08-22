@@ -1,0 +1,76 @@
+{
+  parserClass="io.github.marksosman.dddcontextmapper.parser.CmlParser"
+  parserUtilClass="com.intellij.lang.parser.GeneratedParserUtilBase"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Cml"
+  psiImplClassSuffix="Impl"
+  psiPackage="io.github.marksosman.dddcontextmapper.psi"
+  psiImplPackage="io.github.marksosman.dddcontextmapper.psi.impl"
+
+  elementTypeHolderClass="io.github.marksosman.dddcontextmapper.psi.CmlTypes"
+  elementTypeClass="io.github.marksosman.dddcontextmapper.psi.CmlElementType"
+  tokenTypeClass="io.github.marksosman.dddcontextmapper.CmlTokenType"
+
+  tokens=[
+    KW_CONTEXT_MAP     = "ContextMap"
+    KW_BOUNDED_CONTEXT = "BoundedContext"
+    KW_CONTAINS        = "contains"
+
+    LBRACE   = "{"
+    RBRACE   = "}"
+    LBRACKET = "["
+    RBRACKET = "]"
+    EQ       = "="
+    COMMA    = ","
+
+    BIARROW  = "<->"
+    RARROW   = "->"
+    LARROW   = "<-"
+
+    IDENTIFIER   = "regexp:[A-Za-z_][A-Za-z0-9_]*"
+    STRING       = "regexp:\"[^\"]*\""
+    NUMBER       = "regexp:[0-9]+(\.[0-9]+)?"
+    LINE_COMMENT = "regexp://[^\r\n]*"
+    BLOCK_COMMENT= "regexp:/\*([^*]|\*[^/])*\*/"
+  ]
+}
+
+cmlFile ::= item_*
+
+private item_ ::= contextMap | boundedContext
+
+// Context Map
+
+contextMap ::= KW_CONTEXT_MAP IDENTIFIER LBRACE contextMapEntry* RBRACE {
+  pin=1
+}
+
+private contextMapEntry ::= containsStatement | relationship
+
+containsStatement ::= KW_CONTAINS contextRef { pin=1 }
+
+relationship ::= contextRef roleList? arrow roleList? contextRef
+
+roleList ::= LBRACKET role (COMMA role)* RBRACKET { pin=1 }
+
+role ::= IDENTIFIER
+
+private arrow ::= BIARROW | RARROW | LARROW
+
+// Bounded Context
+
+boundedContext ::= KW_BOUNDED_CONTEXT IDENTIFIER LBRACE property* RBRACE {
+  pin=1
+}
+
+property ::= propertyName EQ propertyValue { pin=2 }
+
+propertyName ::= IDENTIFIER
+
+private propertyValue ::= STRING | NUMBER | IDENTIFIER
+
+// Shared
+
+contextRef ::= IDENTIFIER

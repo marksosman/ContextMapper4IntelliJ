@@ -42,3 +42,9 @@ intellijPlatform {
 kotlin {
     jvmToolchain(21)
 }
+
+sourceSets {
+    main {
+        java.srcDirs("gen", "src/main/java")
+    }
+}
