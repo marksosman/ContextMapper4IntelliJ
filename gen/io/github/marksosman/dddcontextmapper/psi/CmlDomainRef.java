@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface CmlPropertyName extends PsiElement {
+public interface CmlDomainRef extends PsiElement {
 
   @Nullable
   PsiElement getIdentifier();

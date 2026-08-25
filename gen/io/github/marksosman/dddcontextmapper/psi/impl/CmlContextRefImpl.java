@@ -28,9 +28,9 @@ public class CmlContextRefImpl extends ASTWrapperPsiElement implements CmlContex
   }
 
   @Override
-  @NotNull
+  @Nullable
   public PsiElement getIdentifier() {
-    return findNotNullChildByType(IDENTIFIER);
+    return findChildByType(IDENTIFIER);
   }
 
 }

@@ -10,13 +10,4 @@ public interface CmlProperty extends PsiElement {
   @NotNull
   CmlPropertyName getPropertyName();
 
-  @Nullable
-  PsiElement getIdentifier();
-
-  @Nullable
-  PsiElement getNumber();
-
-  @Nullable
-  PsiElement getString();
-
 }

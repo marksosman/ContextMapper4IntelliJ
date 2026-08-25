@@ -13,15 +13,38 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import io.github.marksosman.dddcontextmapper.psi.CmlBoundedContext
 import io.github.marksosman.dddcontextmapper.psi.CmlContextMap
+import io.github.marksosman.dddcontextmapper.psi.CmlContextRef
+import io.github.marksosman.dddcontextmapper.psi.CmlTypes
+
+private val CONTEXT_MAP_PROPERTIES = listOf("type", "state")
 
 private val CONTEXT_PROPERTIES = listOf(
     "type", "domainVisionStatement", "implementationTechnology",
-    "responsibilities", "knowledgeLevel", "implements", "realizes", "refines"
+    "responsibilities", "knowledgeLevel", "businessModel", "evolution"
 )
 
-private val PROPERTY_VALUES = mapOf(
+private val DOMAIN_PROPERTIES = listOf("domainVisionStatement")
+
+private val SUBDOMAIN_PROPERTIES = listOf("type", "domainVisionStatement")
+
+private val CONTEXT_MAP_VALUES = mapOf(
+    "type" to listOf("SYSTEM_LANDSCAPE", "ORGANIZATIONAL"),
+    "state" to listOf("AS_IS", "TO_BE")
+)
+
+private val CONTEXT_VALUES = mapOf(
     "type" to listOf("FEATURE", "APPLICATION", "SYSTEM", "TEAM"),
-    "knowledgeLevel" to listOf("CONCRETE", "META")
+    "knowledgeLevel" to listOf("CONCRETE", "META"),
+    "businessModel" to listOf(
+        "UNDEFINED", "REVENUE", "ENGAGEMENT", "COMPLIANCE", "COST_REDUCTION"
+    ),
+    "evolution" to listOf(
+        "UNDEFINED", "GENESIS", "CUSTOM_BUILT", "PRODUCT", "COMMODITY"
+    )
+)
+
+private val SUBDOMAIN_VALUES = mapOf(
+    "type" to listOf("CORE_DOMAIN", "SUPPORTING_DOMAIN", "GENERIC_SUBDOMAIN")
 )
 
 class CmlCompletionContributor : CompletionContributor() {
@@ -38,9 +61,10 @@ class CmlCompletionContributor : CompletionContributor() {
                     val file = parameters.originalFile
                     val offset = parameters.offset
                     val before = file.text.substring(0, offset)
+                    val block = enclosingBlock(before)
                     val word = lastWordBefore(before)
 
-                    if (word == "contains") {
+                    if (word == "contains" || endsWithContainsList(before)) {
                         val used = containedNames(file, offset)
                         addNames(
                             result,
@@ -51,28 +75,48 @@ class CmlCompletionContributor : CompletionContributor() {
                         return
                     }
 
-                    if (before.trimEnd().endsWith("=")) {
-                        val prop = propertyNameBefore(before)
-                        PROPERTY_VALUES[prop]?.let {
-                            addNames(result, it, prop, 100.0)
+                    val assigned = assignedProperty(before)
+                    if (assigned != null) {
+                        val values = valuesFor(block)[assigned]
+                        if (values != null) {
+                            addNames(result, values, assigned, 100.0)
                             return
                         }
-                        addNames(result, contextNames(file), "BoundedContext", 100.0)
-                        return
+                        if (block == Block.CONTEXT_MAP) {
+                            addNames(result, contextNames(file), "BoundedContext", 100.0)
+                            return
+                        }
                     }
 
-                    when (enclosingBlock(file, offset)) {
-                        Block.BOUNDED_CONTEXT -> {
-                            addKeywords(result, CONTEXT_PROPERTIES, "property", 100.0)
+                    if (block == Block.TOP_LEVEL) {
+                        val clauses = headerClausesFor(before)
+                        if (clauses.isNotEmpty()) {
+                            addKeywords(result, clauses, "clause", 100.0)
+                            return
                         }
+                    }
+
+                    when (block) {
+                        Block.BOUNDED_CONTEXT ->
+                            addKeywords(result, CONTEXT_PROPERTIES, "property", 100.0)
+
                         Block.CONTEXT_MAP -> {
                             addKeywords(result, listOf("contains"), "property", 100.0)
                             addNames(result, contextNames(file), "BoundedContext", 90.0)
+                            addKeywords(result, CONTEXT_MAP_PROPERTIES, "property", 80.0)
                             addKeywords(result, CmlKeywords.RELATIONSHIPS, "relationship", 50.0)
                         }
-                        Block.TOP_LEVEL -> {
-                            addKeywords(result, CmlKeywords.DECLARATIONS, "declaration", 100.0)
+
+                        Block.DOMAIN -> {
+                            addKeywords(result, listOf("Subdomain"), "declaration", 100.0)
+                            addKeywords(result, DOMAIN_PROPERTIES, "property", 90.0)
                         }
+
+                        Block.SUBDOMAIN ->
+                            addKeywords(result, SUBDOMAIN_PROPERTIES, "property", 100.0)
+
+                        Block.TOP_LEVEL ->
+                            addKeywords(result, CmlKeywords.DECLARATIONS, "declaration", 100.0)
                     }
                 }
 
@@ -111,37 +155,59 @@ class CmlCompletionContributor : CompletionContributor() {
         )
     }
 
-    private enum class Block { TOP_LEVEL, CONTEXT_MAP, BOUNDED_CONTEXT }
+    private enum class Block { TOP_LEVEL, CONTEXT_MAP, BOUNDED_CONTEXT, DOMAIN, SUBDOMAIN }
 
     companion object {
-        private fun lastWordBefore(before: String): String {
-            val trimmed = before.trimEnd { it.isLetterOrDigit() || it == '_' }
-            return trimmed.trimEnd().takeLastWhile { it.isLetterOrDigit() || it == '_' }
+        private fun isWordChar(c: Char) = c.isLetterOrDigit() || c == '_'
+
+        private fun valuesFor(block: Block): Map<String, List<String>> = when (block) {
+            Block.CONTEXT_MAP -> CONTEXT_MAP_VALUES
+            Block.BOUNDED_CONTEXT -> CONTEXT_VALUES
+            Block.SUBDOMAIN -> SUBDOMAIN_VALUES
+            else -> emptyMap()
         }
 
-        private fun propertyNameBefore(before: String): String =
-            before.trimEnd().removeSuffix("=").trimEnd()
-                .takeLastWhile { it.isLetterOrDigit() || it == '_' }
+        private fun lastWordBefore(before: String): String =
+            before.trimEnd { isWordChar(it) }.trimEnd().takeLastWhile { isWordChar(it) }
 
-        private fun enclosingBlock(file: PsiFile, offset: Int): Block {
-            val before = file.text.substring(0, offset)
+        private fun assignedProperty(before: String): String? {
+            val trimmed = before.trimEnd()
+            if (trimmed.endsWith("=")) {
+                return trimmed.removeSuffix("=").trimEnd().takeLastWhile { isWordChar(it) }
+            }
+            if (before.isNotEmpty() && !isWordChar(before.last())) {
+                val word = trimmed.takeLastWhile { isWordChar(it) }
+                if (word.isNotEmpty()) return word
+            }
+            return null
+        }
+
+        private fun endsWithContainsList(before: String): Boolean {
+            val trimmed = before.trimEnd()
+            if (!trimmed.endsWith(",")) return false
+            val line = trimmed.substringAfterLast('\n')
+            return line.trimStart().startsWith("contains")
+        }
+
+        private fun headerClausesFor(before: String): List<String> {
+            val line = before.substringAfterLast('\n').trim()
+            if (line.isEmpty()) return emptyList()
+            val head = line.takeWhile { isWordChar(it) }
+            return when (head) {
+                "BoundedContext" -> listOf("implements", "refines", "realizes")
+                "Subdomain" -> listOf("supports")
+                else -> emptyList()
+            }
+        }
+
+        private fun enclosingBlock(before: String): Block {
             var depth = 0
             var i = before.length - 1
             while (i >= 0) {
                 when (before[i]) {
                     '}' -> depth++
                     '{' -> {
-                        if (depth == 0) {
-                            val kw = before.substring(0, i).trimEnd()
-                                .dropLastWhile { it.isLetterOrDigit() || it == '_' }
-                                .trimEnd()
-                                .takeLastWhile { it.isLetterOrDigit() || it == '_' }
-                            return when (kw) {
-                                "BoundedContext" -> Block.BOUNDED_CONTEXT
-                                "ContextMap" -> Block.CONTEXT_MAP
-                                else -> Block.TOP_LEVEL
-                            }
-                        }
+                        if (depth == 0) return blockAt(before, i)
                         depth--
                     }
                 }
@@ -150,9 +216,31 @@ class CmlCompletionContributor : CompletionContributor() {
             return Block.TOP_LEVEL
         }
 
+        private fun blockAt(before: String, braceIndex: Int): Block {
+            var start = braceIndex - 1
+            while (start >= 0 && before[start] != '{' && before[start] != '}') start--
+            val header = before.substring(start + 1, braceIndex)
+            val keyword = header.split(Regex("[^A-Za-z0-9_]+"))
+                .firstOrNull { it in HEADERS }
+            return when (keyword) {
+                "BoundedContext" -> Block.BOUNDED_CONTEXT
+                "ContextMap" -> Block.CONTEXT_MAP
+                "Domain" -> Block.DOMAIN
+                "Subdomain" -> Block.SUBDOMAIN
+                else -> Block.TOP_LEVEL
+            }
+        }
+
+        private val HEADERS =
+            setOf("ContextMap", "BoundedContext", "Domain", "Subdomain")
+
         private fun contextNames(file: PsiFile): List<String> {
             val local = PsiTreeUtil.findChildrenOfType(file, CmlBoundedContext::class.java)
-                .mapNotNull { it.identifier?.text }
+                .mapNotNull { bc ->
+                    bc.node.getChildren(null)
+                        .firstOrNull { it.elementType == CmlTypes.IDENTIFIER }
+                        ?.text
+                }
             val indexed = try {
                 CmlContextIndex.allContextNames(file.project)
             } catch (e: Exception) {
@@ -165,8 +253,8 @@ class CmlCompletionContributor : CompletionContributor() {
             val map = PsiTreeUtil.findChildrenOfType(file, CmlContextMap::class.java)
                 .firstOrNull { offset >= it.textRange.startOffset && offset <= it.textRange.endOffset }
                 ?: return emptySet()
-            return map.containsStatementList
-                .mapNotNull { it.contextRef?.identifier?.text }
+            return PsiTreeUtil.findChildrenOfType(map, CmlContextRef::class.java)
+                .map { it.text }
                 .toSet()
         }
     }

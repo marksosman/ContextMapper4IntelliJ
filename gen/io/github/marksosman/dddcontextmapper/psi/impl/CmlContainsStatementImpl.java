@@ -28,9 +28,9 @@ public class CmlContainsStatementImpl extends ASTWrapperPsiElement implements Cm
   }
 
   @Override
-  @Nullable
-  public CmlContextRef getContextRef() {
-    return findChildByClass(CmlContextRef.class);
+  @NotNull
+  public List<CmlContextRef> getContextRefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlContextRef.class);
   }
 
 }

@@ -29,14 +29,26 @@ public class CmlBoundedContextImpl extends ASTWrapperPsiElement implements CmlBo
 
   @Override
   @NotNull
-  public List<CmlProperty> getPropertyList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlProperty.class);
+  public List<CmlContextRef> getContextRefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlContextRef.class);
   }
 
   @Override
-  @Nullable
-  public PsiElement getIdentifier() {
-    return findChildByType(IDENTIFIER);
+  @NotNull
+  public List<CmlDomainRef> getDomainRefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlDomainRef.class);
+  }
+
+  @Override
+  @NotNull
+  public List<CmlNestedBlock> getNestedBlockList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlNestedBlock.class);
+  }
+
+  @Override
+  @NotNull
+  public List<CmlProperty> getPropertyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlProperty.class);
   }
 
 }

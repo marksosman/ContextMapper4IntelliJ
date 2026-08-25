@@ -11,14 +11,14 @@ import static io.github.marksosman.dddcontextmapper.psi.CmlTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import io.github.marksosman.dddcontextmapper.psi.*;
 
-public class CmlContextMapImpl extends ASTWrapperPsiElement implements CmlContextMap {
+public class CmlSubdomainImpl extends ASTWrapperPsiElement implements CmlSubdomain {
 
-  public CmlContextMapImpl(@NotNull ASTNode node) {
+  public CmlSubdomainImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull CmlVisitor visitor) {
-    visitor.visitContextMap(this);
+    visitor.visitSubdomain(this);
   }
 
   @Override
@@ -29,26 +29,14 @@ public class CmlContextMapImpl extends ASTWrapperPsiElement implements CmlContex
 
   @Override
   @NotNull
-  public List<CmlContainsStatement> getContainsStatementList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlContainsStatement.class);
+  public List<CmlNestedBlock> getNestedBlockList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlNestedBlock.class);
   }
 
   @Override
   @NotNull
   public List<CmlProperty> getPropertyList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlProperty.class);
-  }
-
-  @Override
-  @NotNull
-  public List<CmlRelationship> getRelationshipList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, CmlRelationship.class);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getIdentifier() {
-    return findChildByType(IDENTIFIER);
   }
 
 }

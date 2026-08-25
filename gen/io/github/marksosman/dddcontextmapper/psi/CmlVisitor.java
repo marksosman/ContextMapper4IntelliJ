@@ -23,6 +23,18 @@ public class CmlVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitDomain(@NotNull CmlDomain o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDomainRef(@NotNull CmlDomainRef o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNestedBlock(@NotNull CmlNestedBlock o) {
+    visitPsiElement(o);
+  }
+
   public void visitProperty(@NotNull CmlProperty o) {
     visitPsiElement(o);
   }
@@ -40,6 +52,10 @@ public class CmlVisitor extends PsiElementVisitor {
   }
 
   public void visitRoleList(@NotNull CmlRoleList o) {
+    visitPsiElement(o);
+  }
+
+  public void visitSubdomain(@NotNull CmlSubdomain o) {
     visitPsiElement(o);
   }
 

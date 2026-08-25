@@ -28,9 +28,9 @@ public class CmlRoleImpl extends ASTWrapperPsiElement implements CmlRole {
   }
 
   @Override
-  @NotNull
+  @Nullable
   public PsiElement getIdentifier() {
-    return findNotNullChildByType(IDENTIFIER);
+    return findChildByType(IDENTIFIER);
   }
 
 }

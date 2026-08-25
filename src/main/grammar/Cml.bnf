@@ -16,14 +16,38 @@
   tokens=[
     KW_CONTEXT_MAP     = "ContextMap"
     KW_BOUNDED_CONTEXT = "BoundedContext"
+    KW_DOMAIN          = "Domain"
+    KW_SUBDOMAIN       = "Subdomain"
     KW_CONTAINS        = "contains"
+    KW_IMPLEMENTS      = "implements"
+    KW_REFINES         = "refines"
+    KW_REALIZES        = "realizes"
+    KW_SUPPORTS        = "supports"
+
+    DECL_KEYWORD  = "DECL_KEYWORD"
+    PROP_KEYWORD  = "PROP_KEYWORD"
+    FLOW_KEYWORD  = "FLOW_KEYWORD"
+    STORY_KEYWORD = "STORY_KEYWORD"
+    PRIMITIVE     = "PRIMITIVE"
+    CONSTANT      = "CONSTANT"
 
     LBRACE   = "{"
     RBRACE   = "}"
     LBRACKET = "["
     RBRACKET = "]"
+    LPAREN   = "("
+    RPAREN   = ")"
+    LANGLE   = "<"
+    RANGLE   = ">"
     EQ       = "="
     COMMA    = ","
+    SEMI     = ";"
+    COLON    = ":"
+    DCOLON   = "::"
+    MINUS    = "-"
+    AT       = "@"
+    PLUS     = "+"
+    STAR     = "*"
 
     BIARROW  = "<->"
     RARROW   = "->"
@@ -39,38 +63,75 @@
 
 cmlFile ::= item_*
 
-private item_ ::= contextMap | boundedContext
+private item_ ::= contextMap | boundedContext | domain | subdomain | nestedBlock
+
+private name_ ::= IDENTIFIER | CONSTANT
 
 // Context Map
 
-contextMap ::= KW_CONTEXT_MAP IDENTIFIER LBRACE contextMapEntry* RBRACE {
+contextMap ::= KW_CONTEXT_MAP name_? LBRACE contextMapEntry* RBRACE {
   pin=1
 }
 
-private contextMapEntry ::= containsStatement | relationship
+private contextMapEntry ::= containsStatement | relationship | property
 
-containsStatement ::= KW_CONTAINS contextRef { pin=1 }
+containsStatement ::= KW_CONTAINS contextRef (COMMA contextRef)* { pin=1 }
 
 relationship ::= contextRef roleList? arrow roleList? contextRef
 
 roleList ::= LBRACKET role (COMMA role)* RBRACKET { pin=1 }
 
-role ::= IDENTIFIER
+role ::= CONSTANT | IDENTIFIER
 
 private arrow ::= BIARROW | RARROW | LARROW
 
 // Bounded Context
 
-boundedContext ::= KW_BOUNDED_CONTEXT IDENTIFIER LBRACE property* RBRACE {
+boundedContext ::= KW_BOUNDED_CONTEXT name_ contextHeader_* LBRACE bodyEntry_* RBRACE {
   pin=1
 }
 
-property ::= propertyName EQ propertyValue { pin=2 }
+private contextHeader_ ::= implementsClause | refinesClause | realizesClause
 
-propertyName ::= IDENTIFIER
+private implementsClause ::= KW_IMPLEMENTS domainRef (COMMA domainRef)* { pin=1 }
 
-private propertyValue ::= STRING | NUMBER | IDENTIFIER
+private refinesClause ::= KW_REFINES contextRef { pin=1 }
+
+private realizesClause ::= KW_REALIZES contextRef (COMMA contextRef)* { pin=1 }
+
+domain ::= KW_DOMAIN name_ LBRACE domainEntry_* RBRACE {
+  pin=1
+}
+
+private domainEntry_ ::= subdomain | bodyEntry_
+
+subdomain ::= KW_SUBDOMAIN name_ supportsClause? LBRACE bodyEntry_* RBRACE {
+  pin=1
+}
+
+private supportsClause ::= KW_SUPPORTS name_ (COMMA name_)* { pin=1 }
+
+private bodyEntry_ ::= nestedBlock | property | opaque_
+
+nestedBlock ::= DECL_KEYWORD name_? nestedBody_? { pin=1 }
+
+private nestedBody_ ::= LBRACE bodyEntry_* RBRACE
+
+private opaque_ ::= IDENTIFIER | PROP_KEYWORD | FLOW_KEYWORD | STORY_KEYWORD
+                  | PRIMITIVE | CONSTANT | STRING | NUMBER | DECL_KEYWORD
+                  | LBRACKET | RBRACKET | LPAREN | RPAREN | LANGLE | RANGLE
+                  | EQ | COMMA | SEMI | COLON | DCOLON | MINUS | AT | PLUS | STAR
+                  | BIARROW | RARROW | LARROW
+                  | KW_IMPLEMENTS | KW_REFINES | KW_REALIZES | KW_SUPPORTS | KW_CONTAINS
 
 // Shared
 
-contextRef ::= IDENTIFIER
+property ::= propertyName EQ? propertyValue (COMMA propertyValue)*
+
+propertyName ::= PROP_KEYWORD | IDENTIFIER
+
+private propertyValue ::= STRING | NUMBER | CONSTANT | IDENTIFIER
+
+contextRef ::= IDENTIFIER | CONSTANT
+
+domainRef ::= IDENTIFIER | CONSTANT

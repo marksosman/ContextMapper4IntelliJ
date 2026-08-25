@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface CmlContainsStatement extends PsiElement {
 
-  @Nullable
-  CmlContextRef getContextRef();
+  @NotNull
+  List<CmlContextRef> getContextRefList();
 
 }

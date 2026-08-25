@@ -9,12 +9,13 @@ object CmlKeywords {
         "Enum", "Application"
     )
 
+    val HEADER_CLAUSES = listOf("implements", "refines", "realizes", "supports")
+
     val PROPERTIES = listOf(
         "contains", "type", "state", "domainVisionStatement",
         "implementationTechnology", "responsibilities", "knowledgeLevel",
-        "implements", "realizes", "refines", "exposedAggregates",
-        "aggregateRoot", "upstream", "downstream",
-        "key", "def", "abstract", "extends", "not"
+        "businessModel", "evolution", "downstreamRights", "exposedAggregates",
+        "aggregateRoot"
     )
 
     val RELATIONSHIPS = listOf(
@@ -23,6 +24,7 @@ object CmlKeywords {
     )
 
     val DECLARATION_SET = DECLARATIONS.toSet()
+    val HEADER_CLAUSE_SET = HEADER_CLAUSES.toSet()
     val PROPERTY_SET = PROPERTIES.toSet()
     val RELATIONSHIP_SET = RELATIONSHIPS.toSet()
 }

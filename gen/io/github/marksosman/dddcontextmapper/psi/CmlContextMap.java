@@ -11,6 +11,9 @@ public interface CmlContextMap extends PsiElement {
   List<CmlContainsStatement> getContainsStatementList();
 
   @NotNull
+  List<CmlProperty> getPropertyList();
+
+  @NotNull
   List<CmlRelationship> getRelationshipList();
 
   @Nullable

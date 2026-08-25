@@ -33,22 +33,4 @@ public class CmlPropertyImpl extends ASTWrapperPsiElement implements CmlProperty
     return findNotNullChildByClass(CmlPropertyName.class);
   }
 
-  @Override
-  @Nullable
-  public PsiElement getIdentifier() {
-    return findChildByType(IDENTIFIER);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getNumber() {
-    return findChildByType(NUMBER);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getString() {
-    return findChildByType(STRING);
-  }
-
 }

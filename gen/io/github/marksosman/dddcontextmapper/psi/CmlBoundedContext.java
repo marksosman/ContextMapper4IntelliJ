@@ -8,9 +8,15 @@ import com.intellij.psi.PsiElement;
 public interface CmlBoundedContext extends PsiElement {
 
   @NotNull
-  List<CmlProperty> getPropertyList();
+  List<CmlContextRef> getContextRefList();
 
-  @Nullable
-  PsiElement getIdentifier();
+  @NotNull
+  List<CmlDomainRef> getDomainRefList();
+
+  @NotNull
+  List<CmlNestedBlock> getNestedBlockList();
+
+  @NotNull
+  List<CmlProperty> getPropertyList();
 
 }

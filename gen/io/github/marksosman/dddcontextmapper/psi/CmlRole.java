@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface CmlRole extends PsiElement {
 
-  @NotNull
+  @Nullable
   PsiElement getIdentifier();
 
 }
