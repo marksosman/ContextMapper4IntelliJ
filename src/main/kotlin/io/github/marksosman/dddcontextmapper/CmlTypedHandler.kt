@@ -8,6 +8,24 @@ import com.intellij.psi.PsiFile
 
 class CmlTypedHandler : TypedHandlerDelegate() {
 
+    override fun charTyped(
+        c: Char,
+        project: Project,
+        editor: Editor,
+        file: PsiFile
+    ): Result {
+        if (file.language != CmlLanguage) return Result.CONTINUE
+
+        if (c == '<') {
+            val caret = editor.caretModel.offset
+            if (wordEndingAt(editor, caret - 1) in COLLECTIONS) {
+                editor.document.insertString(caret, ">")
+                return Result.STOP
+            }
+        }
+        return Result.CONTINUE
+    }
+
     override fun checkAutoPopup(
         charTyped: Char,
         project: Project,
@@ -16,29 +34,23 @@ class CmlTypedHandler : TypedHandlerDelegate() {
     ): Result {
         if (file.language != CmlLanguage) return Result.CONTINUE
 
-        val trigger = charTyped.isLetter() ||
-                (charTyped == ' ' && lastKeywordBefore(editor) in VALUE_TAKING)
-
-        if (trigger) {
+        if (charTyped.isLetter() || charTyped in TRIGGERS) {
             AutoPopupController.getInstance(project).scheduleAutoPopup(editor)
         }
         return Result.CONTINUE
     }
 
-    private fun lastKeywordBefore(editor: Editor): String {
+    private fun wordEndingAt(editor: Editor, end: Int): String {
+        if (end <= 0) return ""
         val text = editor.document.charsSequence
-        var end = editor.caretModel.offset
-        while (end > 0 && (text[end - 1].isWhitespace() || text[end - 1] == '=')) end--
         var start = end
         while (start > 0 && (text[start - 1].isLetterOrDigit() || text[start - 1] == '_')) start--
         return text.subSequence(start, end).toString()
     }
 
     companion object {
-        private val VALUE_TAKING = setOf(
-            "contains", "implements", "realizes", "refines", "type",
-            "knowledgeLevel", "domainVisionStatement", "implementationTechnology",
-            "responsibilities", "exposedAggregates", "aggregateRoot"
-        )
+        private val TRIGGERS = setOf(' ', '=', '[', ']', ',', '<', '-')
+
+        private val COLLECTIONS = setOf("List", "Set", "Bag", "Map", "Collection")
     }
 }

@@ -23,6 +23,9 @@ CONSTANT=[A-Z][A-Z0-9_]*
 STRING=\"[^\"]*\"
 NUMBER=[0-9]+(\.[0-9]+)?
 WS=[\ \t]+
+UNI_BIARROW=[\u2194]
+UNI_RARROW=[\u2192]
+UNI_LARROW=[\u2190]
 
 %%
 
@@ -160,6 +163,9 @@ WS=[\ \t]+
   "<->"              { return CmlTypes.BIARROW; }
   "->"               { return CmlTypes.RARROW; }
   "<-"               { return CmlTypes.LARROW; }
+  {UNI_BIARROW}      { return CmlTypes.BIARROW; }
+  {UNI_RARROW}       { return CmlTypes.RARROW; }
+  {UNI_LARROW}       { return CmlTypes.LARROW; }
   "::"               { return CmlTypes.DCOLON; }
 
   "{"                { return CmlTypes.LBRACE; }

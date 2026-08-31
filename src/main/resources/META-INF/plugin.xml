@@ -64,7 +64,9 @@
         <lang.braceMatcher
             language="CML"
             implementationClass="io.github.marksosman.dddcontextmapper.CmlBraceMatcher"/>
-
+        <lang.foldingBuilder
+                language="CML"
+                implementationClass="io.github.marksosman.dddcontextmapper.CmlFoldingBuilder"/>
         <lineIndentProvider implementation="io.github.marksosman.dddcontextmapper.CmlLineIndentProvider"/>
     </extensions>
 </idea-plugin>
